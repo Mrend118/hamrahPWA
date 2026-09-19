@@ -1,0 +1,662 @@
+/* ---------------- سرصفحه صفحه‌ها ---------------- */
+
+.page-head {
+  margin-block-end: var(--space-xl);
+}
+.page-head h1 {
+  font-size: var(--text-xl);
+  letter-spacing: -0.015em;
+}
+.page-head p {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin-block-start: var(--space-2xs);
+}
+.page-head .wave {
+  font-size: 1.1em;
+}
+
+/* ---------------- خانه ---------------- */
+.stat-rail {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.stat-primary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.stat-primary .medal {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  color: var(--gold);
+  flex: none;
+}
+.stat-primary .value {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.stat-primary .label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.stat-secondary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  padding-block-start: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+.stat-cell .label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+.stat-cell .value {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+.stat-cell .value small {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* تفکیک درس‌ها */
+.subject-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+.subject-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  transition:
+    border-color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart);
+}
+.subject-row:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.subject-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: var(--weight-medium);
+}
+.subject-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+.subject-time {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.subject-bar {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.subject-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transform-origin: right center;
+  animation: bar-grow var(--dur-slow) var(--ease-out-expo);
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-block-start: var(--space-lg);
+}
+
+/* ---------------- تایمر ---------------- */
+
+.timer-layout {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.timer-dial {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(280px, 72vw);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.timer-dial svg.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.timer-dial .ring-track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 6;
+}
+.timer-dial .ring-progress {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 900ms linear,
+    stroke var(--dur-base) var(--ease-out-quart);
+}
+.timer-dial[data-state="paused"] .ring-progress {
+  stroke: var(--gold);
+}
+.timer-dial[data-state="ended"] .ring-progress {
+  stroke: var(--text-faint);
+}
+
+.timer-readout {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2xs);
+  z-index: 1;
+}
+.timer-time {
+  font-size: clamp(2.1rem, 9vw, 2.75rem);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+.timer-state-label {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+}
+.timer-subject-label {
+  font-size: var(--text-sm);
+  color: var(--primary);
+  font-weight: var(--weight-medium);
+}
+
+.timer-controls {
+  display: grid;
+  gap: var(--space-xs);
+  max-width: 24rem;
+  margin-inline: auto;
+  width: 100%;
+}
+.timer-controls-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+}
+
+.timer-sync {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+.timer-sync[data-syncing="true"] {
+  color: var(--primary);
+}
+
+/* انتخاب درس */
+.subject-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-height: 40px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  transition: all var(--dur-fast) var(--ease-out-quart);
+}
+.subject-chip:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.subject-chip[aria-pressed="true"] {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: var(--weight-medium);
+}
+.subject-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------------- رتبه‌بندی ---------------- */
+
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  gap: var(--space-xs);
+  margin-block-end: var(--space-xl);
+}
+.podium-slot {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-md) var(--space-xs);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.podium-slot .rank-medal {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin-block-end: var(--space-2xs);
+}
+.podium-slot .who {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+}
+.podium-slot .time {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.podium-slot[data-place="1"] {
+  order: 2;
+  padding-block: var(--space-lg) var(--space-md);
+  border-color: var(--gold);
+  background: linear-gradient(
+    to bottom,
+    var(--gold-soft),
+    var(--surface-1) 72%
+  );
+}
+.podium-slot[data-place="1"] .rank-medal {
+  background: var(--gold);
+  color: var(--on-gold);
+  width: 50px;
+  height: 50px;
+}
+.podium-slot[data-place="1"] .who {
+  font-size: var(--text-base);
+}
+
+.podium-slot[data-place="2"] {
+  order: 1;
+  border-color: var(--silver);
+}
+.podium-slot[data-place="2"] .rank-medal {
+  background: var(--silver-soft);
+  color: var(--silver);
+}
+
+.podium-slot[data-place="3"] {
+  order: 3;
+  border-color: var(--bronze);
+}
+.podium-slot[data-place="3"] .rank-medal {
+  background: var(--bronze-soft);
+  color: var(--bronze);
+}
+
+.rank-table {
+  display: grid;
+  gap: 2px;
+}
+.rank-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  transition: background-color var(--dur-fast) var(--ease-out-quart);
+}
+.rank-row:hover {
+  background: var(--surface-2);
+}
+.rank-row[data-me="true"] {
+  background: var(--primary-soft);
+  outline: 1px solid var(--primary);
+}
+.rank-number {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-bold);
+  color: var(--text-faint);
+}
+.rank-row[data-me="true"] .rank-number {
+  color: var(--primary);
+}
+.rank-person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+.rank-person .name {
+  font-weight: var(--weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rank-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.my-rank-sticky {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-h) + var(--space-xs));
+  margin-block-start: var(--space-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------------- اطلاعیه‌ها ---------------- */
+
+.announcement-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+.announcement {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  transition: border-color var(--dur-fast) var(--ease-out-quart);
+}
+.announcement:hover {
+  border-color: var(--border-strong);
+}
+.announcement[data-unread="true"] {
+  background: var(--surface-2);
+}
+.announcement-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.announcement[data-tone="warning"] .announcement-icon {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+.announcement[data-tone="danger"] .announcement-icon {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.announcement-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.announcement-title {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+}
+.announcement-date {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.announcement-body {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-block-start: var(--space-2xs);
+  max-width: 70ch;
+}
+.announcement-body a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-all;
+}
+
+/* ---------------- مشاور / گفت‌وگو ---------------- */
+
+.chat-layout {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--space-md);
+  height: calc(
+    100dvh - var(--header-h) - var(--bottom-nav-h) - var(--space-2xl)
+  );
+  min-height: 24rem;
+}
+.chat-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+}
+.chat-day {
+  align-self: center;
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  background: var(--surface-1);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-pill);
+}
+.bubble {
+  max-width: min(78%, 46ch);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  animation: bubble-in var(--dur-base) var(--ease-out-expo);
+}
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.bubble-time {
+  display: block;
+  margin-block-start: var(--space-2xs);
+  font-size: 0.6875rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.bubble[data-from="consultant"] {
+  align-self: flex-start;
+  background: var(--surface-2);
+  border-start-start-radius: var(--radius-sm);
+}
+.bubble[data-from="me"] {
+  align-self: flex-end;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  border-start-end-radius: var(--radius-sm);
+}
+.bubble[data-status="sending"] {
+  opacity: 0.6;
+}
+.bubble[data-status="failed"] {
+  border-color: var(--danger);
+}
+.bubble-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  color: var(--danger);
+  text-decoration: underline;
+  margin-block-start: var(--space-2xs);
+}
+
+.chat-composer {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-end;
+  padding: var(--space-xs);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.chat-composer .textarea {
+  resize: none;
+  max-height: 7.5rem;
+  background: transparent;
+  border: none;
+  padding: var(--space-xs) var(--space-sm);
+}
+.chat-composer .textarea:focus-visible {
+  outline: none;
+}
+.chat-composer:focus-within {
+  border-color: var(--primary);
+}
+
+/* ---------------- ورود ---------------- */
+
+.login-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl) var(--space-md);
+}
+.login-card {
+  width: min(24rem, 100%);
+  display: grid;
+  gap: var(--space-lg);
+  text-align: center;
+}
+.login-logo {
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: var(--radius-xl);
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+.login-card h1 {
+  font-size: var(--text-lg);
+}
+.login-card .lead {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 32ch;
+  margin-inline: auto;
+}
+.login-form {
+  display: grid;
+  gap: var(--space-md);
+  text-align: start;
+}
+.login-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  font-size: var(--text-sm);
+  text-align: start;
+}
+.password-wrap {
+  position: relative;
+}
+.password-wrap .input {
+  padding-inline-start: 3rem;
+}
+.password-toggle {
+  position: absolute;
+  inset-inline-start: var(--space-2xs);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-faint);
+}
+.password-toggle:hover {
+  color: var(--text);
+}
+.login-foot {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+
+/* ---------------- ناموجود ---------------- */
+.not-found {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  padding-block: var(--space-3xl);
+  text-align: center;
+}
+.not-found .code {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  color: var(--surface-3);
+  line-height: 1;
+}

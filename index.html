@@ -1,11 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b2420" />
+    <meta
+      name="description"
+      content="همراه | ثبت زمان مطالعه، تایمر هوشمند، رتبه‌بندی و ارتباط با مشاور"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="همراه" />
+
+    <title>همراه | دستیار مطالعه</title>
+
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fontsource-variable/vazirmatn@5.0.20/index.min.css"
+    />
+
+    <link rel="stylesheet" href="./src/styles/reset.css" />
+    <link rel="stylesheet" href="./src/styles/variables.css" />
+    <link rel="stylesheet" href="./src/styles/global.css" />
+    <link rel="stylesheet" href="./src/styles/components.css" />
+    <link rel="stylesheet" href="./src/styles/pages.css" />
+    <link rel="stylesheet" href="./src/styles/responsive.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">پرش به محتوای اصلی</a>
+
+    <div id="app" class="app-shell">
+      <header id="app-header" class="app-header" role="banner"></header>
+
+      <main id="main" class="app-main" tabindex="-1">
+        <div class="boot-state" role="status">در حال آماده‌سازی…</div>
+      </main>
+
+      <nav id="bottom-nav" class="bottom-nav" aria-label="ناوبری اصلی"></nav>
+    </div>
+
+    <div
+      id="toast-region"
+      class="toast-region"
+      role="region"
+      aria-live="polite"
+      aria-label="پیام‌های سیستم"
+    ></div>
+    <div id="offline-banner" class="offline-banner" hidden></div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
 </html>

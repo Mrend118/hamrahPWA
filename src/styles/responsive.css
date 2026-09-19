@@ -1,0 +1,159 @@
+/* ---------- موبایل بزرگ ---------- */
+@media (min-width: 480px) {
+  .timer-controls-row {
+    gap: var(--space-sm);
+  }
+  .podium {
+    gap: var(--space-sm);
+  }
+}
+
+/* ---------- تبلت ---------- */
+@media (min-width: 768px) {
+  .app-main {
+    padding-inline: var(--space-lg);
+    padding-block-end: calc(var(--bottom-nav-h) + var(--space-2xl));
+  }
+  .page-head h1 {
+    font-size: var(--text-2xl);
+  }
+  .stat-rail {
+    padding: var(--space-xl);
+  }
+  .stat-secondary {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+  .subject-list {
+    grid-template-columns: repeat(2, 1fr);
+    display: grid;
+  }
+  .announcement-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- دسکتاپ ---------- */
+@media (min-width: 1024px) {
+  .top-nav {
+    display: block;
+  }
+  .header-user {
+    display: flex;
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+
+  .app-main {
+    padding-block: var(--space-2xl) var(--space-3xl);
+  }
+
+  .offline-banner {
+    bottom: 0;
+  }
+  .toast-region {
+    bottom: var(--space-lg);
+    justify-items: end;
+    padding-inline: var(--space-2xl);
+  }
+
+  /* خانه */
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .stat-rail {
+    gap: var(--space-lg);
+  }
+  .stat-primary .value {
+    font-size: var(--text-2xl);
+  }
+
+  /* تایم */
+  .timer-layout {
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+  .timer-dial {
+    width: 300px;
+  }
+  .timer-side {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  /* رتبه‌بندی */
+  .podium {
+    gap: var(--space-lg);
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+  .podium-slot {
+    padding: var(--space-lg) var(--space-md);
+  }
+  .podium-slot[data-place="1"] {
+    padding-block: var(--space-xl) var(--space-lg);
+  }
+  .rank-row {
+    grid-template-columns: 3rem 1fr auto;
+    padding-inline: var(--space-lg);
+  }
+  .my-rank-sticky {
+    bottom: var(--space-md);
+  }
+
+  /* گفت‌وگو */
+  .chat-layout {
+    height: calc(
+      100dvh - var(--header-h) - var(--space-3xl) - var(--space-2xl)
+    );
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+  .bubble {
+    max-width: min(62%, 62ch);
+  }
+
+  .announcement-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+}
+
+@media (min-width: 1280px) {
+  .subject-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .announcement-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- حالت افقی در موبایل ---------- */
+@media (max-height: 520px) and (max-width: 1023px) {
+  .timer-dial {
+    width: min(190px, 46vw);
+  }
+  .timer-time {
+    font-size: 1.6rem;
+  }
+}
+
+/* ---------- چاپ ---------- */
+@media print {
+  .app-header,
+  .bottom-nav,
+  .toast-region,
+  .offline-banner {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

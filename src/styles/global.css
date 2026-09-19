@@ -1,0 +1,293 @@
+body {
+  font-family: var(--font-fa);
+  font-size: var(--text-base);
+  font-weight: 350;
+  line-height: var(--leading-normal);
+  color: var(--text);
+  background: var(--bg);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:where(h1) {
+  font-size: var(--text-xl);
+}
+:where(h2) {
+  font-size: var(--text-lg);
+}
+:where(h3) {
+  font-size: var(--text-base);
+}
+
+strong {
+  font-weight: var(--weight-bold);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  font-weight: var(--weight-medium);
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: var(--space-md);
+  top: -100px;
+  z-index: var(--z-toast);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius-sm);
+  transition: top var(--dur-base) var(--ease-out-quart);
+}
+.skip-link:focus-visible {
+  top: var(--space-md);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--primary-soft);
+  color: var(--text);
+}
+
+/* ---------- پوسته ---------- */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: var(--space-lg) var(--space-md)
+    calc(var(--bottom-nav-h) + var(--space-2xl));
+}
+
+.app-main:focus {
+  outline: none;
+}
+
+.boot-state {
+  padding: var(--space-3xl) 0;
+  text-align: center;
+  color: var(--text-faint);
+}
+
+/* ---------- هدر ---------- */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  background: color-mix(in oklch, var(--bg) 88%, transparent);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.header-inner {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  min-height: var(--header-h);
+  padding-inline: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ناوبری بالا (دسکتاپ) */
+.top-nav {
+  display: none;
+}
+
+.top-nav-list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  list-style: none;
+}
+
+.top-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  transition:
+    color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart);
+}
+.top-nav-link:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.top-nav-link[aria-current="page"] {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+.top-nav-link svg {
+  flex: none;
+}
+
+.header-actions {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.header-user {
+  display: none;
+  align-items: center;
+  gap: var(--space-xs);
+  padding-inline-end: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.header-user .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+}
+
+/* ناوبری پایین (موبایل) */
+.bottom-nav {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  justify-content: space-around;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-2xs)
+    calc(var(--space-2xs) + env(safe-area-inset-bottom));
+  background: color-mix(in oklch, var(--surface-1) 94%, transparent);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
+.bottom-nav-link {
+  flex: 1;
+  min-height: var(--tap-min);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: var(--space-2xs) 0;
+  border-radius: var(--radius-md);
+  color: var(--text-faint);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  transition:
+    color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart);
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-link:active {
+  background: var(--surface-2);
+}
+.bottom-nav-link[aria-current="page"] {
+  color: var(--primary);
+}
+.bottom-nav-link[aria-current="page"] .nav-icon {
+  background: var(--primary-soft);
+}
+.bottom-nav-link .nav-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--dur-base) var(--ease-out-quart);
+}
+
+/* بنر آفلاین */
+.offline-banner {
+  position: fixed;
+  inset-inline: 0;
+  bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--danger-soft);
+  color: var(--text);
+  font-size: var(--text-sm);
+  border-top: 1px solid var(--danger);
+}
+
+/* ---------- صفحه ورودی ---------- */
+
+body.no-chrome .app-header,
+body.no-chrome .bottom-nav {
+  display: none !important;
+}
+
+body.no-chrome .app-main {
+  padding: 0;
+  max-width: none;
+}
+
+body.no-chrome .toast-region {
+  bottom: var(--space-lg);
+}
+body.no-chrome .offline-banner {
+  bottom: 0;
+}

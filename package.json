@@ -1,0 +1,15 @@
+{
+  "name": "hamrah-study-pwa",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "اپلیکیشن تحت وب (PWA) ثبت و پیگیری زمان مطالعه - لایه فرانت‌اند",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}

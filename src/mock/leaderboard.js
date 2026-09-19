@@ -1,0 +1,16 @@
+/** داده آزمایشی: رتبه‌بندی هفتگی */
+export const mockLeaderboard = [
+  { rank: 1, userId: 26, name: 'کاربر ۲۶', minutes: 2790, level: 14 },
+  { rank: 2, userId: 35, name: 'کاربر ۳۵', minutes: 2640, level: 13 },
+  { rank: 3, userId: 2, name: 'کاربر ۰۲', minutes: 2580, level: 13 },
+  { rank: 4, userId: 41, name: 'کاربر ۴۱', minutes: 2415, level: 12 },
+  { rank: 5, userId: 18, name: 'کاربر ۱۸', minutes: 2330, level: 12 },
+  { rank: 6, userId: 7, name: 'کاربر ۰۷', minutes: 2190, level: 11 },
+  { rank: 7, userId: 53, name: 'کاربر ۵۳', minutes: 2065, level: 11 },
+  { rank: 8, userId: 12, name: 'کاربر ۱۲', minutes: 1980, level: 11 },
+  { rank: 9, userId: 31, name: 'کاربر ۳۱', minutes: 1875, level: 10 },
+  { rank: 10, userId: 60, name: 'کاربر ۶۰', minutes: 1790, level: 10 },
+  { rank: 11, userId: 9, name: 'کاربر ۰۹', minutes: 1680, level: 10 },
+  { rank: 12, userId: 22, name: 'کاربر ۲۲', minutes: 1585, level: 9 },
+  { rank: 24, userId: 100, name: 'علی رضایی', minutes: 510, level: 12, isMe: true },
+];
