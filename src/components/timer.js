@@ -23,11 +23,6 @@ const STATE_LABELS = {
   ended: "پایان یافته — ثبت نشده",
 };
 
-/**
- * @param {HTMLElement} host
- * @param {{getSubjectTitle: (id: any) => string}} options
- * @returns {{destroy: () => void}}
- */
 export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
   host.innerHTML = `
     <div class="timer-dial" data-state="idle">
@@ -60,7 +55,6 @@ export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
 
   const renderTime = (state) => {
     timeEl.textContent = formatClock(state.elapsedMs);
-    // حلقه پیشرفت: یک دور کامل = یک ساعت مطالعه
     const ratio = (state.elapsedMs % 3_600_000) / 3_600_000;
     ring.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - ratio));
   };
@@ -107,8 +101,6 @@ export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
         </div>`;
       return;
     }
-
-    // ended — منتظر ثبت نهایی
     controls.innerHTML = `
       <button class="btn btn-gold btn-lg btn-block" type="button" data-action="save"
         ${state.saving || busy ? "disabled" : ""}>
@@ -148,8 +140,6 @@ export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
 
     renderTime(state);
     renderSync(state);
-
-    // کنترل‌ها فقط وقتی وضعیت واقعاً عوض شده دوباره ساخته می‌شوند
     const next = `${state.status}|${state.pending}|${state.saving}|${state.subjectId}`;
     if (next !== signature) {
       signature = next;
@@ -159,7 +149,6 @@ export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
 
   const unsubscribe = sessionStore.subscribe(
     (state) => {
-      // در تیک‌های ثانیه‌ای فقط عدد به‌روزرسانی می‌شود (بدون رندر دوباره DOM)
       render(state);
     },
     { immediate: true },
@@ -208,11 +197,14 @@ export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
       case "save": {
         const result = await save({ subjectId: state.subjectId });
         if (result.ok) {
+          const seconds = result.result?.seconds;
           const minutes = result.result?.minutes;
           toastSuccess(
-            minutes
-              ? `مطالعه ثبت شد: ${formatDuration(minutes * 60000)}`
-              : "مطالعه ثبت شد.",
+            seconds != null
+              ? `مطالعه ثبت شد: ${formatDuration(seconds * 1000)}`
+              : minutes
+                ? `مطالعه ثبت شد: ${formatDuration(minutes * 60000)}`
+                : "مطالعه ثبت شد.",
           );
           host.dispatchEvent(
             new CustomEvent("session:saved", {
@@ -232,7 +224,12 @@ export function mountTimer(host, { getSubjectTitle = () => "" } = {}) {
           confirmLabel: "ثبت نکن",
           danger: true,
         });
-        if (confirmed) discard();
+        if (confirmed) {
+          const result = await discard();
+          if (result.ok)
+            toastSuccess("نشست حذف شد و می‌توانی دوباره شروع کنی.");
+          else if (result.error) toastError(result.error.userMessage);
+        }
         break;
       }
       default:

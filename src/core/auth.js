@@ -1,5 +1,3 @@
-/*وضعیت احراز هویت (سمت کلاینت)*/
-
 import { createStore } from "./store.js";
 import {
   fetchCurrentUser,

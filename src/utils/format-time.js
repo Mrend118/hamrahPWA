@@ -21,14 +21,16 @@ export function formatClock(ms) {
 }
 
 export function formatDuration(ms, { short = false } = {}) {
-  const totalMinutes = Math.max(0, Math.round((ms || 0) / 60000));
-  const h = Math.floor(totalMinutes / 60);
-  const m = totalMinutes % 60;
+  const totalSeconds = Math.max(0, Math.floor((ms || 0) / 1000));
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
 
-  if (h === 0 && m === 0) return short ? "۰ دقیقه" : "بدون مطالعه";
+  if (totalSeconds === 0) return short ? "۰ ثانیه" : "بدون مطالعه";
   const parts = [];
   if (h > 0) parts.push(`${toFa(h)} ساعت`);
   if (m > 0) parts.push(`${toFa(m)} دقیقه`);
+  if (h === 0 && s > 0) parts.push(`${toFa(s)} ثانیه`);
   return parts.join(" و ");
 }
 

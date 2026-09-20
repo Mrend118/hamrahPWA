@@ -8,12 +8,10 @@
   --border: oklch(35% 0.028 172);
   --border-strong: oklch(45% 0.032 172);
 
-  /* --- متن --- */
   --text: oklch(96% 0.01 172);
   --text-muted: oklch(76% 0.016 172);
   --text-faint: oklch(62% 0.018 172);
 
-  /* --- رنگ اصلی (فیروزه‌ای) --- */
   --primary: oklch(80% 0.128 188);
   --primary-hover: oklch(85% 0.118 188);
   --primary-press: oklch(73% 0.128 188);
@@ -30,24 +28,21 @@
   --bronze: oklch(70% 0.105 52);
   --bronze-soft: oklch(30% 0.05 52);
 
-  /* --- معنایی --- */
   --success: oklch(76% 0.135 158);
   --success-soft: oklch(29% 0.055 158);
   --danger: oklch(69% 0.155 24);
   --danger-soft: oklch(29% 0.065 24);
   --warning: oklch(80% 0.12 78);
 
-  /* --- فاصله‌گذاری --- */
-  --space-2xs: 0.25rem; /*  4px */
-  --space-xs: 0.5rem; /*  8px */
-  --space-sm: 0.75rem; /* 12px */
-  --space-md: 1rem; /* 16px */
-  --space-lg: 1.5rem; /* 24px */
-  --space-xl: 2rem; /* 32px */
-  --space-2xl: 3rem; /* 48px */
-  --space-3xl: 4rem; /* 64px */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
 
-  /* --- تایپوگرافی --- */
   --font-fa:
     "Vazirmatn Variable", "Vazirmatn", "IRANSans", "Segoe UI", Tahoma,
     system-ui, sans-serif;
@@ -66,19 +61,16 @@
   --leading-tight: 1.25;
   --leading-normal: 1.65;
 
-  /* --- بردر ردیوس--- */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
   --radius-xl: 26px;
   --radius-pill: 999px;
 
-  /* --- ارتفاع/سایه --- */
   --shadow-sm: 0 1px 2px oklch(12% 0.02 172 / 0.45);
   --shadow-md: 0 8px 20px -8px oklch(10% 0.02 172 / 0.6);
   --shadow-lg: 0 22px 48px -18px oklch(8% 0.02 172 / 0.7);
 
-  /* --- حرکت --- */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -86,14 +78,12 @@
   --dur-base: 220ms;
   --dur-slow: 380ms;
 
-  /* --- لایه‌بندی معنایی --- */
   --z-sticky: 100;
   --z-nav: 200;
   --z-dropdown: 300;
   --z-dialog: 400;
   --z-toast: 500;
 
-  /* --- اندازه‌ها --- */
   --header-h: 68px;
   --bottom-nav-h: 68px;
   --content-max: 1180px;

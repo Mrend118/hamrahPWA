@@ -1,18 +1,25 @@
-import { createStore } from './store.js';
-import { CONFIG } from '../config.js';
-import { networkStore } from './network.js';
-import { handleAuthError } from './auth.js';
+import { createStore } from "./store.js";
+import { CONFIG } from "../config.js";
+import { networkStore } from "./network.js";
+import { handleAuthError } from "./auth.js";
 import {
-  startSession, pauseSession, resumeSession, endSession, saveSession,
-  getActiveSession, readCachedSession, cacheActiveSession,
-} from '../api/study-sessions.js';
+  startSession,
+  pauseSession,
+  resumeSession,
+  endSession,
+  saveSession,
+  getActiveSession,
+  readCachedSession,
+  cacheActiveSession,
+  discardSession,
+} from "../api/study-sessions.js";
 
 export const SESSION_STATES = {
-  idle: 'idle',
-  running: 'running',
-  paused: 'paused',
-  ended: 'ended',
-  saved: 'saved',
+  idle: "idle",
+  running: "running",
+  paused: "paused",
+  ended: "ended",
+  saved: "saved",
 };
 
 export const sessionStore = createStore({
@@ -20,26 +27,24 @@ export const sessionStore = createStore({
   session: null,
   elapsedMs: 0,
   subjectId: null,
-  loading: true,      
-  pending: null,      
+  loading: true,
+  pending: null,
   saving: false,
   syncing: false,
-  stale: false,       
+  stale: false,
   error: null,
 });
 
-/** اختلاف ساعت دستگاه با سرور */
 let clockSkew = 0;
 let ticker = null;
 let syncTimer = null;
-
-/* ---------------- محاسبه زمان ---------------- */
 
 const serverNow = () => Date.now() + clockSkew;
 export function computeElapsedMs(session, now = serverNow()) {
   if (!session) return 0;
   const base = Number(session.accumulatedSeconds || 0) * 1000;
-  if (session.status !== SESSION_STATES.running || !session.lastResumedAt) return base;
+  if (session.status !== SESSION_STATES.running || !session.lastResumedAt)
+    return base;
   const since = now - new Date(session.lastResumedAt).getTime();
   return base + Math.max(0, since);
 }
@@ -75,8 +80,6 @@ function manageTicker() {
   }
 }
 
-/* ---------------- بازیابی و همگام‌سازی ---------------- */
-
 export async function restoreActiveSession({ silent = false } = {}) {
   if (!silent) sessionStore.set({ loading: true });
   sessionStore.set({ syncing: true });
@@ -101,7 +104,9 @@ export async function restoreActiveSession({ silent = false } = {}) {
       return cached;
     }
 
-    sessionStore.set({ error: error.userMessage ?? 'دریافت اطلاعات با مشکل مواجه شد.' });
+    sessionStore.set({
+      error: error.userMessage ?? "دریافت اطلاعات با مشکل مواجه شد.",
+    });
     return null;
   }
 }
@@ -121,33 +126,29 @@ function stopPeriodicSync() {
   syncTimer = null;
 }
 
-/** قفل گوشی، تعویض تب، بازگشت اینترنت */
 export function initSessionLifecycle() {
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible') return;
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
     const { status } = sessionStore.get();
-    // با بازگشت به صفحه، زمان از سرور تأیید می‌شود تا انحراف جمع نشود.
     if (status !== SESSION_STATES.idle) restoreActiveSession({ silent: true });
   });
 
   networkStore.subscribe(({ online }) => {
-    if (online && sessionStore.get().stale) restoreActiveSession({ silent: true });
+    if (online && sessionStore.get().stale)
+      restoreActiveSession({ silent: true });
   });
 
   startPeriodicSync();
-  window.addEventListener('pagehide', () => {
+  window.addEventListener("pagehide", () => {
     if (ticker) clearInterval(ticker);
     ticker = null;
     stopPeriodicSync();
   });
 }
 
-/* ---------------- کنش‌ها ---------------- */
-
-/** جلوگیری از ارسال تکراری */
 async function runAction(name, fn) {
   const state = sessionStore.get();
-  if (state.pending) return { ok: false, reason: 'busy' };
+  if (state.pending) return { ok: false, reason: "busy" };
 
   sessionStore.set({ pending: name, error: null });
   try {
@@ -158,7 +159,9 @@ async function runAction(name, fn) {
       await handleAuthError();
       return { ok: false, error };
     }
-    sessionStore.set({ error: error?.userMessage ?? 'انجام نشد. دوباره تلاش کنید.' });
+    sessionStore.set({
+      error: error?.userMessage ?? "انجام نشد. دوباره تلاش کنید.",
+    });
     return { ok: false, error };
   } finally {
     sessionStore.set({ pending: null });
@@ -168,14 +171,14 @@ async function runAction(name, fn) {
 export const selectSubject = (subjectId) => sessionStore.set({ subjectId });
 
 export function start(subjectId) {
-  return runAction('start', async () => {
+  return runAction("start", async () => {
     const session = await startSession(subjectId);
     return applySession(session);
   });
 }
 
 export function pause() {
-  return runAction('pause', async () => {
+  return runAction("pause", async () => {
     const { session } = sessionStore.get();
     if (!session) return null;
     return applySession(await pauseSession(session.id));
@@ -183,7 +186,7 @@ export function pause() {
 }
 
 export function resume() {
-  return runAction('resume', async () => {
+  return runAction("resume", async () => {
     const { session } = sessionStore.get();
     if (!session) return null;
     return applySession(await resumeSession(session.id));
@@ -191,20 +194,20 @@ export function resume() {
 }
 
 export function end() {
-  return runAction('end', async () => {
+  return runAction("end", async () => {
     const { session } = sessionStore.get();
     if (!session) return null;
     return applySession(await endSession(session.id));
   });
 }
 
-/** ثبت نهایی مطالعه */
 export function save({ subjectId } = {}) {
   const state = sessionStore.get();
-  if (state.saving || !state.session) return Promise.resolve({ ok: false, reason: 'busy' });
+  if (state.saving || !state.session)
+    return Promise.resolve({ ok: false, reason: "busy" });
 
   sessionStore.set({ saving: true });
-  return runAction('save', async () => {
+  return runAction("save", async () => {
     const result = await saveSession({
       sessionId: state.session.id,
       subjectId: subjectId ?? state.subjectId ?? state.session.subjectId,
@@ -222,7 +225,18 @@ export function save({ subjectId } = {}) {
 }
 
 export function discard() {
-  cacheActiveSession(null);
-  sessionStore.set({ session: null, status: SESSION_STATES.idle, elapsedMs: 0, stale: false, error: null });
-  manageTicker();
+  return runAction("discard", async () => {
+    const { session } = sessionStore.get();
+    if (session) await discardSession(session.id);
+    cacheActiveSession(null);
+    sessionStore.set({
+      session: null,
+      status: SESSION_STATES.idle,
+      elapsedMs: 0,
+      stale: false,
+      error: null,
+    });
+    manageTicker();
+    return true;
+  });
 }

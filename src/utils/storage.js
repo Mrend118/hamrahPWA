@@ -1,11 +1,9 @@
-/* (کش موقت / فالبک آفلاین)*/
-
-const PREFIX = 'hamrah:';
+const PREFIX = "hamrah:";
 
 function available() {
   try {
     const k = `${PREFIX}__test`;
-    window.localStorage.setItem(k, '1');
+    window.localStorage.setItem(k, "1");
     window.localStorage.removeItem(k);
     return true;
   } catch {
@@ -47,7 +45,10 @@ export const storage = {
   },
 
   clearAll() {
-    if (!canUse) { memory.clear(); return; }
+    if (!canUse) {
+      memory.clear();
+      return;
+    }
     Object.keys(window.localStorage)
       .filter((k) => k.startsWith(PREFIX))
       .forEach((k) => window.localStorage.removeItem(k));
@@ -55,12 +56,12 @@ export const storage = {
 };
 
 export const STORAGE_KEYS = {
-  authToken: 'auth.token',
-  authUser: 'auth.user',
-  activeSession: 'session.active', 
-  lastSubject: 'timer.lastSubject',
-  cachedStats: 'cache.studyStats',
-  cachedLeaderboard: 'cache.leaderboard',
-  cachedAnnouncements: 'cache.announcements',
-  seenAnnouncements: 'announcements.seen',
+  authToken: "auth.token",
+  authUser: "auth.user",
+  activeSession: "session.active",
+  lastSubject: "timer.lastSubject",
+  cachedStats: "cache.studyStats",
+  cachedLeaderboard: "cache.leaderboard",
+  cachedAnnouncements: "cache.announcements",
+  seenAnnouncements: "announcements.seen",
 };

@@ -1,4 +1,3 @@
-// هارنس تست: شبیه‌سازی حداقلی مرورگر برای اجرای منطق در Node
 const store = new Map();
 const localStorage = {
   getItem: (k) => (store.has(k) ? store.get(k) : null),
@@ -58,12 +57,10 @@ check("formatDuration 0", fmt.formatDuration(0), "بدون مطالعه");
 check("toEn", fmt.toEn("۱۲۳۴"), "1234");
 check("greeting 13", fmt.greetingForHour(13), "ظهر بخیر");
 
-// سناریوی تایمر: شروع → سپری شدن → توقف → ادامه → پایان → ثبت
 const started = await ss.start(2);
 check("start ok", started.ok, true);
 check("status running", ss.sessionStore.get().status, "running");
 
-// عقب بردن مهر زمانی سرور برای شبیه‌سازی گذر ۹۰ دقیقه
 const raw = JSON.parse(localStorage.getItem("hamrah:mock:session"));
 const past = new Date(Date.now() - 90 * 60000).toISOString();
 localStorage.setItem(
@@ -91,7 +88,6 @@ check("saved minutes ≈ 90", saved.result.minutes, 90);
 check("status back to idle", ss.sessionStore.get().status, "idle");
 check("no active session", await api.getActiveSession(), null);
 
-// نشست دوم و بازیابی از کش آفلاین
 await ss.start(1);
 globalThis.window.__MOCK_FAIL__ = 500;
 await ss.restoreActiveSession({ silent: true });
@@ -99,7 +95,7 @@ check("offline fallback marks stale", ss.sessionStore.get().stale, true);
 delete globalThis.window.__MOCK_FAIL__;
 await ss.restoreActiveSession({ silent: true });
 check("resync clears stale", ss.sessionStore.get().stale, false);
-ss.discard();
+await ss.discard();
 
 console.log(failures ? `\n${failures} تست ناموفق` : "\nهمه تست‌ها موفق");
 process.exit(failures ? 1 : 0);

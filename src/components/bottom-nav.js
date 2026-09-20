@@ -5,9 +5,10 @@ import { currentRoute } from "../core/router.js";
 
 export function mountBottomNav(host) {
   const render = () => {
-    const authed = authStore.get().status === "authenticated";
-    host.hidden = !authed;
-    if (!authed) {
+    const { status, user } = authStore.get();
+    const visible = status === "authenticated" && user?.role === "student";
+    host.hidden = !visible;
+    if (!visible) {
       host.innerHTML = "";
       return;
     }

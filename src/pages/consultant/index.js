@@ -1,7 +1,3 @@
-/**
- * صفحه گفت‌وگو با مشاور
- */
-
 import {
   getMessages,
   sendMessage,
@@ -27,8 +23,8 @@ export async function render(outlet) {
 
   outlet.innerHTML = `
     <header class="page-head">
-      <h1>چت با مشاور</h1>
-      <p>معمولاً تا ۲۴ ساعت آینده پاسخ می‌گیری${user?.consultantName ? ` — مشاور شما: ${escapeHtml(user.consultantName)}` : ""}.</p>
+      <h1>درخواست مشاوره و گفتگو</h1>
+      <p>درخواستت را همین‌جا بنویس؛ معمولاً تا ۲۴ ساعت آینده پاسخ می‌گیری${user?.consultantName ? ` — مشاور شما: ${escapeHtml(user.consultantName)}` : ""}.</p>
     </header>
 
     <div class="chat-layout">
@@ -38,7 +34,7 @@ export async function render(outlet) {
 
       <form class="chat-composer" data-part="form" autocomplete="off">
         <label class="sr-only" for="chat-input">متن پیام</label>
-        <textarea class="textarea" id="chat-input" name="text" rows="1" placeholder="پیامت رو بنویس…" maxlength="1200"></textarea>
+        <textarea class="textarea" id="chat-input" name="text" rows="1" placeholder="درخواست یا سوالت رو اینجا بنویس…" maxlength="1200"></textarea>
         <button class="btn btn-primary btn-icon" type="submit" data-part="send" aria-label="ارسال پیام">
           ${icon("send", { size: 18 })}
         </button>
@@ -111,7 +107,6 @@ export async function render(outlet) {
       );
       if (target) target.status = "sending";
     } else {
-      // به‌روزرسانی خوش‌بینانه: پیام فوری نمایش داده می‌شود، وضعیت «در حال ارسال»
       messages = [
         ...messages,
         {
@@ -160,8 +155,6 @@ export async function render(outlet) {
     input.style.height = "auto";
     submit(text);
   });
-
-  // Enter برای ارسال، Shift+Enter برای خط جدید
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -184,6 +177,7 @@ export async function render(outlet) {
   });
 
   const unsubscribe = subscribeToMessages((message) => {
+    if (messages.some((item) => String(item.id) === String(message.id))) return;
     messages = [...messages, message];
     paint();
   });

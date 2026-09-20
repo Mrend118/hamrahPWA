@@ -1,4 +1,3 @@
-/* ---------- موبایل بزرگ ---------- */
 @media (min-width: 480px) {
   .timer-controls-row {
     gap: var(--space-sm);
@@ -8,7 +7,6 @@
   }
 }
 
-/* ---------- تبلت ---------- */
 @media (min-width: 768px) {
   .app-main {
     padding-inline: var(--space-lg);
@@ -33,7 +31,6 @@
   }
 }
 
-/* ---------- دسکتاپ ---------- */
 @media (min-width: 1024px) {
   .top-nav {
     display: block;
@@ -59,7 +56,6 @@
     padding-inline: var(--space-2xl);
   }
 
-  /* خانه */
   .home-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
@@ -73,7 +69,6 @@
     font-size: var(--text-2xl);
   }
 
-  /* تایم */
   .timer-layout {
     grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
     gap: var(--space-2xl);
@@ -87,7 +82,6 @@
     gap: var(--space-lg);
   }
 
-  /* رتبه‌بندی */
   .podium {
     gap: var(--space-lg);
     max-width: 44rem;
@@ -107,7 +101,6 @@
     bottom: var(--space-md);
   }
 
-  /* گفت‌وگو */
   .chat-layout {
     height: calc(
       100dvh - var(--header-h) - var(--space-3xl) - var(--space-2xl)
@@ -134,7 +127,6 @@
   }
 }
 
-/* ---------- حالت افقی در موبایل ---------- */
 @media (max-height: 520px) and (max-width: 1023px) {
   .timer-dial {
     width: min(190px, 46vw);
@@ -144,7 +136,6 @@
   }
 }
 
-/* ---------- چاپ ---------- */
 @media print {
   .app-header,
   .bottom-nav,

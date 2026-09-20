@@ -8,8 +8,8 @@ import {
 } from "./core/study-session.js";
 import { mountNavbar } from "./components/navbar.js";
 import { mountBottomNav } from "./components/bottom-nav.js";
-
-/* ---------- ثبت مسیرها ---------- */
+import { currentUser } from "./core/auth.js";
+import { initInstallPrompt } from "./components/install-prompt.js";
 
 registerRoute(ROUTES.home, {
   title: "خانه",
@@ -37,8 +37,11 @@ registerRoute(ROUTES.login, {
   chrome: false,
   load: () => import("./pages/login/index.js"),
 });
-
-/* ---------- راه‌اندازی ---------- */
+registerRoute(ROUTES.admin, {
+  title: "پنل مدیریت",
+  roles: ["admin", "superadmin"],
+  load: () => import("./pages/admin/index.js"),
+});
 
 async function bootstrap() {
   initNetworkWatcher();
@@ -50,10 +53,13 @@ async function bootstrap() {
 
   await startRouter(document.getElementById("main"));
 
-  initSessionLifecycle();
-  restoreActiveSession({ silent: true });
+  if (currentUser()?.role === "student") {
+    initSessionLifecycle();
+    restoreActiveSession({ silent: true });
+  }
 
   registerServiceWorker();
+  initInstallPrompt();
 
   if (CONFIG.useMock) {
     console.info(
@@ -73,7 +79,7 @@ function registerServiceWorker() {
 
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register(new URL("../sw.js", import.meta.url), { scope: "./" })
+      .register("./sw.js", { scope: "./" })
       .catch((error) =>
         console.warn("[pwa] ثبت Service Worker انجام نشد.", error),
       );

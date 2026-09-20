@@ -1,4 +1,4 @@
-const VERSION = "hamrah-v1";
+const VERSION = "hamrah-v8";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 

@@ -18,7 +18,7 @@ export function createStore(initialState = {}) {
       });
       return state;
     },
-    /** @returns {() => void} تابع لغو اشتراک */
+
     subscribe(listener, { immediate = false } = {}) {
       listeners.add(listener);
       if (immediate) listener(state);

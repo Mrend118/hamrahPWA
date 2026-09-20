@@ -4,36 +4,24 @@ import { storage, STORAGE_KEYS } from "../utils/storage.js";
 import { mockRequest } from "../mock/index.js";
 
 export const ENDPOINTS = {
-  // احراز هویت
   login: "/auth/login",
   logout: "/auth/logout",
   me: "/auth/me",
-
-  // پروفایل و آمار
   profile: "/profile",
   studyStats: "/study-stats",
   subjects: "/subjects",
   subjectStats: "/subjects/stats",
-
-  // نشست مطالعه
   sessionStart: "/study-sessions/start",
   sessionPause: "/study-sessions/pause",
   sessionResume: "/study-sessions/resume",
   sessionEnd: "/study-sessions/end",
   sessionSave: "/study-sessions/save",
   sessionActive: "/study-sessions/active",
-
-  // رتبه‌بندی
   leaderboard: "/leaderboard",
-
-  // اطلاعیه‌ها
   announcements: "/announcements",
-
-  // گفت‌وگو با مشاور
   chatMessages: "/chat/messages",
 };
 
-/** ساخت آدرس کامل + پارامترهای کوئری */
 function buildUrl(endpoint, params) {
   const base = String(CONFIG.apiBaseUrl || "").replace(/\/$/, "");
   const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
@@ -46,23 +34,14 @@ function buildUrl(endpoint, params) {
   return `${base}${path}${query ? `?${query}` : ""}`;
 }
 
-/** هدرهای احراز هویت بر اساس روش انتخابی بک‌اند */
 function authHeaders() {
   if (CONFIG.authMode !== "token") return {};
   const token = storage.get(STORAGE_KEYS.authToken);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-/**
- * درخواست پایه.
- * @param {string} endpoint یکی از مقادیر ENDPOINTS
- * @param {{method?: string, body?: any, params?: object, signal?: AbortSignal, auth?: boolean}} options
- * @returns {Promise<{data: any, status: number, serverTime: number}>}
- */
 export async function request(endpoint, options = {}) {
   const { method = "GET", body, params, signal, auth = true } = options;
-
-  // حالت داده آزمایشی
   if (CONFIG.useMock) {
     return mockRequest(method, endpoint, { body, params });
   }
@@ -99,12 +78,9 @@ export async function request(endpoint, options = {}) {
     if (error?.name === "AbortError") {
       throw new ApiError(ERROR_KINDS.timeout, { endpoint, details: error });
     }
-    // خطای شبکه: DNS، قطع اینترنت، CORS
     throw new ApiError(ERROR_KINDS.offline, { endpoint, details: error });
   }
   clearTimeout(timeoutId);
-
-  // زمان سرور برای اصلاح اختلاف ساعت دستگاه کاربر
   const serverDate = response.headers.get("Date");
   const serverTime = serverDate ? new Date(serverDate).getTime() : Date.now();
 
@@ -131,7 +107,6 @@ export async function request(endpoint, options = {}) {
   return { data: payload, status: response.status, serverTime };
 }
 
-/** میان‌برهای خوانا */
 export const http = {
   get: (endpoint, options) => request(endpoint, { ...options, method: "GET" }),
   post: (endpoint, body, options) =>

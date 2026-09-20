@@ -21,7 +21,6 @@ export function normalizeSession(raw, serverTime = Date.now()) {
   };
 }
 
-/** کش موقت نشست فعالع UI در حالت آفلاین */
 export function cacheActiveSession(session) {
   if (session)
     storage.set(STORAGE_KEYS.activeSession, {
@@ -35,9 +34,6 @@ export function readCachedSession() {
   return storage.get(STORAGE_KEYS.activeSession, null);
 }
 
-/**
- * API Name: شروع نشست مطالعه
- */
 export async function startSession(subjectId) {
   const { data, serverTime } = await http.post(ENDPOINTS.sessionStart, {
     subjectId,
@@ -47,9 +43,6 @@ export async function startSession(subjectId) {
   return session;
 }
 
-/**
- * API Name: توقف موقت
- */
 export async function pauseSession(sessionId) {
   const { data, serverTime } = await http.post(ENDPOINTS.sessionPause, {
     sessionId,
@@ -59,9 +52,6 @@ export async function pauseSession(sessionId) {
   return session;
 }
 
-/**
- * API Name: ادامه
- */
 export async function resumeSession(sessionId) {
   const { data, serverTime } = await http.post(ENDPOINTS.sessionResume, {
     sessionId,
@@ -71,9 +61,6 @@ export async function resumeSession(sessionId) {
   return session;
 }
 
-/**
- * API Name: پایان نشست
- */
 export async function endSession(sessionId) {
   const { data, serverTime } = await http.post(ENDPOINTS.sessionEnd, {
     sessionId,
@@ -83,9 +70,6 @@ export async function endSession(sessionId) {
   return session;
 }
 
-/**
- * API Name: ثبت نهایی مطالعه
- */
 export async function saveSession({ sessionId, subjectId, note }) {
   const payload = { sessionId, subjectId };
   if (note) payload.note = note; // اختیاری؛ اگر بک‌اند پشتیبانی کند
@@ -94,12 +78,15 @@ export async function saveSession({ sessionId, subjectId, note }) {
   return data;
 }
 
-/**
- * API Name: نشست فعال
- */
 export async function getActiveSession() {
   const { data, serverTime } = await http.get(ENDPOINTS.sessionActive);
   const session = normalizeSession(data, serverTime);
   cacheActiveSession(session);
   return session;
+}
+
+export async function discardSession(sessionId) {
+  const { data } = await http.del(`/study-sessions/${sessionId}`);
+  cacheActiveSession(null);
+  return data;
 }

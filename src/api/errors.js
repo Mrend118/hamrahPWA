@@ -25,10 +25,6 @@ const MESSAGES = {
 };
 
 export class ApiError extends Error {
-  /**
-   * @param {string} kind یکی از ERROR_KINDS
-   * @param {{status?: number, endpoint?: string, details?: any, message?: string}} meta
-   */
   constructor(kind, meta = {}) {
     super(meta.message || MESSAGES[kind] || MESSAGES.unknown);
     this.name = "ApiError";
@@ -36,7 +32,13 @@ export class ApiError extends Error {
     this.status = meta.status ?? 0;
     this.endpoint = meta.endpoint ?? "";
     this.details = meta.details ?? null;
-    this.userMessage = MESSAGES[kind] || MESSAGES.unknown;
+    const serverMessage =
+      typeof meta.details?.detail === "string"
+        ? meta.details.detail
+        : typeof meta.details?.message === "string"
+          ? meta.details.message
+          : null;
+    this.userMessage = serverMessage || MESSAGES[kind] || MESSAGES.unknown;
   }
 
   get isAuthError() {
@@ -57,7 +59,6 @@ export class ApiError extends Error {
   }
 }
 
-/** تبدیل کد وضعیت HTTP به نوع خطا */
 export function kindFromStatus(status) {
   if (status === 400) return ERROR_KINDS.badRequest;
   if (status === 401) return ERROR_KINDS.unauthorized;

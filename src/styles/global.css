@@ -74,8 +74,6 @@ strong {
   color: var(--text);
 }
 
-/* ---------- پوسته ---------- */
-
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -100,8 +98,6 @@ strong {
   text-align: center;
   color: var(--text-faint);
 }
-
-/* ---------- هدر ---------- */
 
 .app-header {
   position: sticky;
@@ -140,7 +136,6 @@ strong {
   color: var(--primary);
 }
 
-/* ناوبری بالا (دسکتاپ) */
 .top-nav {
   display: none;
 }
@@ -204,7 +199,6 @@ strong {
   font-weight: var(--weight-bold);
 }
 
-/* ناوبری پایین (موبایل) */
 .bottom-nav {
   position: fixed;
   inset-inline: 0;
@@ -256,7 +250,6 @@ strong {
   transition: background-color var(--dur-base) var(--ease-out-quart);
 }
 
-/* بنر آفلاین */
 .offline-banner {
   position: fixed;
   inset-inline: 0;
@@ -272,8 +265,6 @@ strong {
   font-size: var(--text-sm);
   border-top: 1px solid var(--danger);
 }
-
-/* ---------- صفحه ورودی ---------- */
 
 body.no-chrome .app-header,
 body.no-chrome .bottom-nav {

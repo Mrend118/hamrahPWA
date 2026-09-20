@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hamrah
+      POSTGRES_USER: hamrah
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hamrah"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+psycopg://hamrah:${POSTGRES_PASSWORD:-change-me}@db:5432/hamrah
+      SECRET_KEY: ${SECRET_KEY:-replace-with-a-long-random-secret}
+      LOGIN_PEPPER: ${LOGIN_PEPPER:-replace-once-before-creating-users}
+      ACCESS_TOKEN_MINUTES: 720
+      MIN_SESSION_SECONDS: ${MIN_SESSION_SECONDS:-5}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+      SEED_DEMO: ${SEED_DEMO:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-80}:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

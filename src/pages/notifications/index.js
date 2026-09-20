@@ -1,10 +1,13 @@
-/*صفحه اطلاعیه‌ها*/
-
-import { getAnnouncements } from '../../api/announcements.js';
-import { renderAnnouncement } from '../../components/notification-card.js';
-import { bindRetry, emptyState, errorState, skeletonRows } from '../../components/loading.js';
-import { storage, STORAGE_KEYS } from '../../utils/storage.js';
-import { icon } from '../../assets/icons/index.js';
+import { getAnnouncements } from "../../api/announcements.js";
+import { renderAnnouncement } from "../../components/notification-card.js";
+import {
+  bindRetry,
+  emptyState,
+  errorState,
+  skeletonRows,
+} from "../../components/loading.js";
+import { storage, STORAGE_KEYS } from "../../utils/storage.js";
+import { icon } from "../../assets/icons/index.js";
 
 export async function render(outlet) {
   let aborted = false;
@@ -16,7 +19,7 @@ export async function render(outlet) {
         <p>پیام‌ها و اطلاعیه‌های مدیر مجموعه.</p>
       </div>
       <button class="btn btn-ghost btn-icon" type="button" data-part="refresh" aria-label="به‌روزرسانی اطلاعیه‌ها" title="به‌روزرسانی">
-        ${icon('refresh', { size: 18 })}
+        ${icon("refresh", { size: 18 })}
       </button>
     </header>
 
@@ -33,30 +36,37 @@ export async function render(outlet) {
 
       if (!items.length) {
         list.innerHTML = emptyState({
-          title: 'هنوز اطلاعیه‌ای منتشر نشده است.',
-          text: 'وقتی مدیر یا مشاور اطلاعیه‌ای بفرستد، همین‌جا نمایش داده می‌شود.',
-          iconName: 'megaphone',
+          title: "هنوز اطلاعیه‌ای منتشر نشده است.",
+          text: "وقتی مدیر یا مشاور اطلاعیه‌ای بفرستد، همین‌جا نمایش داده می‌شود.",
+          iconName: "megaphone",
         });
         return;
       }
 
       const seen = new Set(storage.get(STORAGE_KEYS.seenAnnouncements, []));
       list.innerHTML = `<div class="announcement-list">
-        ${items.map((item) => renderAnnouncement(item, { unread: !seen.has(item.id) })).join('')}
+        ${items.map((item) => renderAnnouncement(item, { unread: !seen.has(item.id) })).join("")}
       </div>`;
-      storage.set(STORAGE_KEYS.seenAnnouncements, items.map((item) => item.id));
+      storage.set(
+        STORAGE_KEYS.seenAnnouncements,
+        items.map((item) => item.id),
+      );
     } catch (error) {
       if (aborted) return;
       list.innerHTML = errorState({
-        title: 'دریافت اطلاعیه‌ها با مشکل مواجه شد.',
-        text: error.userMessage ?? 'دوباره تلاش کنید.',
+        title: "دریافت اطلاعیه‌ها با مشکل مواجه شد.",
+        text: error.userMessage ?? "دوباره تلاش کنید.",
       });
       bindRetry(list, load);
     }
   }
 
-  refresh.addEventListener('click', load);
+  refresh.addEventListener("click", load);
   await load();
 
-  return { destroy() { aborted = true; } };
+  return {
+    destroy() {
+      aborted = true;
+    },
+  };
 }

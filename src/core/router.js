@@ -1,16 +1,11 @@
 import { ROUTES } from "../config.js";
-import { isAuthenticated, authStore } from "./auth.js";
+import { isAuthenticated, authStore, currentUser } from "./auth.js";
 
 const routes = new Map();
 let outlet = null;
 let currentView = null;
 let currentPath = null;
 
-/**
- * ثبت مسیر
- * @param {string} path
- * @param {{load: () => Promise<{render: Function}>, requiresAuth?: boolean, chrome?: boolean, title?: string}} config
- */
 export function registerRoute(path, config) {
   routes.set(path, { requiresAuth: true, chrome: true, ...config });
 }
@@ -47,8 +42,27 @@ async function resolve() {
     return;
   }
 
+  const role = currentUser()?.role;
+  if (
+    isAuthenticated() &&
+    role !== "student" &&
+    path !== ROUTES.admin &&
+    path !== ROUTES.login
+  ) {
+    navigate(ROUTES.admin, { replace: true });
+    return;
+  }
+  if (route.roles && !route.roles.includes(role)) {
+    navigate(role === "student" ? ROUTES.home : ROUTES.admin, {
+      replace: true,
+    });
+    return;
+  }
+
   if (path === ROUTES.login && isAuthenticated()) {
-    navigate(ROUTES.home, { replace: true });
+    navigate(role === "student" ? ROUTES.home : ROUTES.admin, {
+      replace: true,
+    });
     return;
   }
 
@@ -73,7 +87,6 @@ async function resolve() {
     const module = await route.load();
     const view = await module.render(outlet, { query, navigate });
     currentView = view || null;
-    // انیمیشن ورود صفحه
     requestAnimationFrame(() => outlet.classList.add("page-enter"));
     outlet.scrollIntoView({ block: "start" });
     window.scrollTo({ top: 0 });

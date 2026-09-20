@@ -1,10 +1,6 @@
 import { icon } from "../assets/icons/index.js";
 import { escapeHtml } from "../utils/helpers.js";
 
-/**
- * @param {HTMLElement} host
- * @param {{subjects: Array, selectedId: any, disabled: boolean, onSelect: Function}} options
- */
 export function renderSubjectPicker(
   host,
   { subjects = [], selectedId = null, disabled = false, onSelect },
