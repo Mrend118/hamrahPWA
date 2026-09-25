@@ -57,6 +57,18 @@ export async function render(outlet) {
       </section>
     </div>
 
+    <section class="panel quick-links-panel" aria-labelledby="quick-links-title">
+      <div class="section-head">
+        <div><h2 id="quick-links-title">ورود سریع به پنل‌های آموزشی</h2><p class="hint">گاج، ماز و کانون قلم‌چی؛ همه در یک‌جا</p></div>
+        ${icon("forward", { size: 20 })}
+      </div>
+      <div class="education-links">
+        ${educationLink("https://www.gaj.ir/", "/quick-links/gaj.svg", "گاج", "ورود به خدمات آموزشی گاج")}
+        ${educationLink("https://biomaze.ir/", "/quick-links/maz.webp", "ماز", "ورود به آزمون‌ها و پنل ماز")}
+        ${educationLink("https://www.kanoon.ir/", "/quick-links/kanoon.webp", "کانون قلم‌چی", "ورود به صفحه شخصی کانون")}
+      </div>
+    </section>
+
     <section class="panel profile-request-panel" aria-labelledby="profile-request-title">
       <div class="section-head">
         <div><h2 id="profile-request-title">درخواست ویرایش اطلاعات</h2><p class="hint">تغییر نام پس از تأیید سوپرادمین اعمال می‌شود.</p></div>
@@ -174,6 +186,14 @@ export async function render(outlet) {
       aborted = true;
     },
   };
+}
+
+function educationLink(href, logo, title, description) {
+  return `<a class="education-link" href="${href}" target="_blank" rel="noopener noreferrer">
+    <span class="education-link-logo"><img src="${logo}" alt="لوگوی ${escapeHtml(title)}" loading="lazy"></span>
+    <span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></span>
+    ${icon("forward", { size: 17 })}
+  </a>`;
 }
 
 function statsSkeleton() {

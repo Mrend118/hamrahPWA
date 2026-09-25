@@ -14,10 +14,10 @@ from sqlalchemy.orm import Session, joinedload
 from .config import settings
 from .database import Base, SessionLocal, engine, get_db
 from .deps import admin_user, current_user, superadmin_user
-from .models import Announcement, AuditLog, ChatMessage, Group, ProfileChangeRequest, StudySession, Subject, User
-from .schemas import AnnouncementIn, AnnouncementUpdateIn, GroupIn, LoginIn, MessageIn, ProfileChangeRequestIn, SessionActionIn, SessionSaveIn, SessionStartIn, SubjectIn, UserCreateIn, UserUpdateIn
+from .models import Announcement, AuditLog, ChatMessage, Group, GroupProfile, GroupSubject, ProfileChangeRequest, StudySession, Subject, SubjectCurriculum, User
+from .schemas import AnnouncementIn, AnnouncementUpdateIn, GroupIn, LoginIn, MessageIn, PasswordChangeIn, ProfileChangeRequestIn, SessionActionIn, SessionSaveIn, SessionStartIn, SubjectIn, UserCreateIn, UserUpdateIn
 from .security import code_digest, create_token, decode_token, generate_login_code, hash_code, verify_code
-from .seed import seed
+from .seed import seed, seed_curriculum
 from .services import TEHRAN, accumulated, as_utc, iso, now_utc, period_start, ranking, session_json
 
 
@@ -27,6 +27,9 @@ async def lifespan(_: FastAPI):
     if settings.seed_demo:
         with SessionLocal() as db:
             seed(db)
+    else:
+        with SessionLocal() as db:
+            seed_curriculum(db)
     yield
 
 
@@ -64,10 +67,63 @@ class LoginLimiter:
 
 login_limiter = LoginLimiter()
 
+TRACK_LABELS = {"middle": "متوسطه اول", "math": "ریاضی", "experimental": "تجربی", "humanities": "انسانی", "general": "عمومی"}
+
+
+def infer_curriculum(grade: str | None) -> tuple[str | None, str | None]:
+    value = (grade or "").strip()
+    for level in ("هفتم", "هشتم", "نهم"):
+        if level in value:
+            return "middle", level
+    for level in ("دهم", "یازدهم", "دوازدهم"):
+        if level in value:
+            if "تجربی" in value: return "experimental", level
+            if "انسانی" in value: return "humanities", level
+            if "ریاضی" in value: return "math", level
+    return None, None
+
+
+def group_json(group: Group, db: Session) -> dict:
+    profile = db.get(GroupProfile, group.id)
+    rows = db.execute(
+        select(Subject.id, Subject.title).join(GroupSubject, GroupSubject.subject_id == Subject.id)
+        .where(GroupSubject.group_id == group.id).order_by(Subject.title)
+    ).all()
+    consultant = db.get(User, profile.consultant_id) if profile and profile.consultant_id else None
+    return {
+        "id": group.id, "name": group.name,
+        "track": profile.track if profile else "general",
+        "trackLabel": TRACK_LABELS.get(profile.track, profile.track) if profile else "عمومی",
+        "grade": profile.grade if profile else None,
+        "consultantId": profile.consultant_id if profile else None,
+        "consultantName": consultant.full_name if consultant else None,
+        "subjectIds": [row.id for row in rows],
+        "subjects": [{"id": row.id, "title": row.title} for row in rows],
+    }
+
+
+def subject_ids_for_user(db: Session, user: User) -> list[int]:
+    if user.group_id:
+        ids = list(db.scalars(select(GroupSubject.subject_id).where(GroupSubject.group_id == user.group_id)))
+        if ids: return ids
+        profile = db.get(GroupProfile, user.group_id)
+        if profile and profile.grade:
+            ids = list(db.scalars(select(SubjectCurriculum.subject_id).where(
+                SubjectCurriculum.track == profile.track, SubjectCurriculum.grade == profile.grade
+            )))
+            if ids: return ids
+    track, grade = infer_curriculum(user.grade)
+    if track and grade:
+        return list(db.scalars(select(SubjectCurriculum.subject_id).where(
+            SubjectCurriculum.track == track, SubjectCurriculum.grade == grade
+        )))
+    return []
+
 
 def profile_json(user: User, db: Session) -> dict:
     board = ranking(db, "week") if user.role == "student" else []
     rank = next((item["rank"] for item in board if item["userId"] == user.id), None)
+    group_profile = db.get(GroupProfile, user.group_id) if user.group_id else None
     return {
         "id": user.id,
         "name": user.first_name or user.full_name.split()[0],
@@ -79,6 +135,8 @@ def profile_json(user: User, db: Session) -> dict:
         "grade": user.grade,
         "groupId": user.group_id,
         "groupName": user.group.name if user.group else None,
+        "track": group_profile.track if group_profile else infer_curriculum(user.grade)[0],
+        "trackLabel": TRACK_LABELS.get(group_profile.track) if group_profile else TRACK_LABELS.get(infer_curriculum(user.grade)[0]),
         "consultantName": user.consultant.full_name if user.consultant else None,
     }
 
@@ -127,6 +185,22 @@ def login(payload: LoginIn, request: Request, db: Session = Depends(get_db)):
 
 @app.post("/api/auth/logout")
 def logout(_: User = Depends(current_user)):
+    return {"ok": True}
+
+
+@app.post("/api/auth/change-password")
+def change_own_password(payload: PasswordChangeIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    if not verify_code(payload.currentCode, user.login_code_hash):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "رمز فعلی صحیح نیست")
+    new_code = payload.newCode.strip()
+    if new_code == payload.currentCode:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "رمز جدید باید با رمز فعلی متفاوت باشد")
+    if db.scalar(select(User.id).where(User.login_code_digest == code_digest(new_code), User.id != user.id)):
+        raise HTTPException(status.HTTP_409_CONFLICT, "این رمز ورود قبلاً استفاده شده است")
+    user.login_code_digest = code_digest(new_code)
+    user.login_code_hash = hash_code(new_code)
+    audit(db, user, "password.change-own", "user", user.id)
+    db.commit()
     return {"ok": True}
 
 
@@ -194,8 +268,11 @@ def my_profile_change_requests(
 
 
 @app.get("/api/subjects")
-def subjects(_: User = Depends(current_user), db: Session = Depends(get_db)):
-    rows = db.scalars(select(Subject).where(Subject.is_active.is_(True)).order_by(Subject.id)).all()
+def subjects(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    stmt = select(Subject).where(Subject.is_active.is_(True)).order_by(Subject.title)
+    allowed_ids = subject_ids_for_user(db, user) if user.role == "student" else []
+    if allowed_ids: stmt = stmt.where(Subject.id.in_(allowed_ids))
+    rows = db.scalars(stmt).all()
     return {"items": [{"id": row.id, "title": row.title} for row in rows]}
 
 
@@ -264,6 +341,7 @@ def subject_stats(
 ):
     require_student(user)
     start = period_start(period)
+    allowed_ids = subject_ids_for_user(db, user)
     stmt = (
         select(Subject.id, Subject.title, func.coalesce(func.sum(StudySession.accumulated_seconds), 0).label("seconds"))
         .outerjoin(
@@ -276,6 +354,8 @@ def subject_stats(
         .group_by(Subject.id)
         .order_by(Subject.id)
     )
+    if allowed_ids:
+        stmt = stmt.where(Subject.id.in_(allowed_ids))
     if start:
         stmt = stmt.where(or_(StudySession.saved_at.is_(None), StudySession.saved_at >= start))
     return {
@@ -304,6 +384,9 @@ def start_session(payload: SessionStartIn, user: User = Depends(current_user), d
     subject = db.get(Subject, payload.subjectId)
     if not subject or not subject.is_active:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "درس پیدا نشد")
+    allowed_ids = subject_ids_for_user(db, user)
+    if allowed_ids and subject.id not in allowed_ids:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "این درس برای گروه یا پایه شما فعال نیست")
     now = now_utc()
     session = StudySession(user_id=user.id, subject_id=subject.id, started_at=now, last_resumed_at=now)
     db.add(session)
@@ -539,6 +622,8 @@ def create_user(payload: UserCreateIn, actor: User = Depends(admin_user), db: Se
         raise HTTPException(status.HTTP_403_FORBIDDEN, "اجازه ساخت این نقش را ندارید")
     login_code = payload.loginCode or generate_login_code()
     public_code = payload.publicCode or f"ST-{generate_login_code(6)}"
+    group_profile = db.get(GroupProfile, payload.groupId) if payload.groupId else None
+    assigned_consultant = actor.id if actor.role == "admin" else payload.consultantId or (group_profile.consultant_id if group_profile else None)
     user = User(
         public_code=public_code,
         login_code_digest=code_digest(login_code),
@@ -549,7 +634,7 @@ def create_user(payload: UserCreateIn, actor: User = Depends(admin_user), db: Se
         grade=payload.grade if payload.role == "student" else None,
         level=payload.level,
         group_id=payload.groupId,
-        consultant_id=actor.id if actor.role == "admin" else payload.consultantId,
+        consultant_id=assigned_consultant,
     )
     db.add(user)
     try:
@@ -589,6 +674,10 @@ def update_user(user_id: int, payload: UserUpdateIn, actor: User = Depends(admin
                 user.login_code_hash = hash_code(new_code)
             continue
         setattr(user, mapping.get(key, key), value)
+    if "groupId" in values and values["groupId"]:
+        profile = db.get(GroupProfile, values["groupId"])
+        if profile and profile.consultant_id and "consultantId" not in values:
+            user.consultant_id = profile.consultant_id
     audit(db, actor, "user.update", "user", user.id)
     db.commit()
     result = {"user": profile_json(user, db)}
@@ -613,8 +702,8 @@ def disable_user(user_id: int, actor: User = Depends(admin_user), db: Session = 
 
 @app.get("/api/admin/groups")
 def admin_groups(_: User = Depends(admin_user), db: Session = Depends(get_db)):
-    rows = db.scalars(select(Group).where(Group.is_active.is_(True)).order_by(Group.name)).all()
-    return {"items": [{"id": row.id, "name": row.name} for row in rows]}
+    rows = db.scalars(select(Group).options(joinedload(Group.profile), joinedload(Group.subject_links)).where(Group.is_active.is_(True)).order_by(Group.name)).unique().all()
+    return {"items": [group_json(row, db) for row in rows]}
 
 
 @app.post("/api/admin/groups", status_code=201)
@@ -623,12 +712,19 @@ def create_group(payload: GroupIn, actor: User = Depends(admin_user), db: Sessio
     db.add(group)
     try:
         db.flush()
+        consultant_id = actor.id if actor.role == "admin" else payload.consultantId
+        if consultant_id:
+            consultant = db.get(User, consultant_id)
+            if not consultant or consultant.role not in {"admin", "superadmin"}:
+                raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "مشاور انتخاب‌شده معتبر نیست")
+        db.add(GroupProfile(group_id=group.id, track=payload.track, grade=payload.grade, consultant_id=consultant_id))
+        db.add_all([GroupSubject(group_id=group.id, subject_id=sid) for sid in set(payload.subjectIds)])
         audit(db, actor, "group.create", "group", group.id)
         db.commit()
     except IntegrityError:
         db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "نام گروه تکراری است")
-    return {"id": group.id, "name": group.name}
+    return group_json(group, db)
 
 
 @app.patch("/api/admin/groups/{group_id}")
@@ -637,13 +733,28 @@ def update_group(group_id: int, payload: GroupIn, actor: User = Depends(admin_us
     if not group:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "گروه پیدا نشد")
     group.name = payload.name.strip()
+    profile = db.get(GroupProfile, group.id)
+    if not profile:
+        profile = GroupProfile(group_id=group.id)
+        db.add(profile)
+    profile.track = payload.track
+    profile.grade = payload.grade
+    consultant_id = actor.id if actor.role == "admin" else payload.consultantId
+    if consultant_id:
+        consultant = db.get(User, consultant_id)
+        if not consultant or consultant.role not in {"admin", "superadmin"}:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "مشاور انتخاب‌شده معتبر نیست")
+    profile.consultant_id = consultant_id
+    db.query(GroupSubject).filter(GroupSubject.group_id == group.id).delete(synchronize_session=False)
+    db.add_all([GroupSubject(group_id=group.id, subject_id=sid) for sid in set(payload.subjectIds)])
+    db.query(User).filter(User.group_id == group.id, User.role == "student").update({User.consultant_id: consultant_id}, synchronize_session=False)
     audit(db, actor, "group.update", "group", group.id)
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "نام گروه تکراری است")
-    return {"id": group.id, "name": group.name}
+    return group_json(group, db)
 
 
 @app.delete("/api/admin/groups/{group_id}")
@@ -661,6 +772,34 @@ def disable_group(group_id: int, actor: User = Depends(admin_user), db: Session 
 def admin_subjects(_: User = Depends(admin_user), db: Session = Depends(get_db)):
     rows = db.scalars(select(Subject).order_by(Subject.id)).all()
     return {"items": [{"id": row.id, "title": row.title, "isActive": row.is_active} for row in rows]}
+
+
+@app.get("/api/admin/curriculum")
+def admin_curriculum(track: str, grade: str, _: User = Depends(admin_user), db: Session = Depends(get_db)):
+    rows = db.execute(
+        select(Subject.id, Subject.title).join(SubjectCurriculum, SubjectCurriculum.subject_id == Subject.id)
+        .where(SubjectCurriculum.track == track, SubjectCurriculum.grade == grade, Subject.is_active.is_(True))
+        .order_by(Subject.title)
+    ).all()
+    return {"items": [{"id": row.id, "title": row.title} for row in rows]}
+
+
+@app.get("/api/admin/users/{user_id}/study-stats")
+def admin_student_study_stats(user_id: int, actor: User = Depends(admin_user), db: Session = Depends(get_db)):
+    student = db.get(User, user_id)
+    if not student or student.role != "student":
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "دانش‌آموز پیدا نشد")
+    rows = db.execute(
+        select(Subject.id, Subject.title, func.coalesce(func.sum(StudySession.accumulated_seconds), 0).label("seconds"))
+        .join(StudySession, StudySession.subject_id == Subject.id)
+        .where(StudySession.user_id == student.id, StudySession.status == "saved")
+        .group_by(Subject.id, Subject.title).order_by(func.sum(StudySession.accumulated_seconds).desc())
+    ).all()
+    total = sum(int(row.seconds) for row in rows)
+    return {
+        "student": profile_json(student, db), "totalSeconds": total, "totalMinutes": round(total / 60, 2),
+        "subjects": [{"subjectId": row.id, "title": row.title, "seconds": int(row.seconds), "minutes": round(int(row.seconds) / 60, 2)} for row in rows],
+    }
 
 
 @app.post("/api/admin/subjects", status_code=201)

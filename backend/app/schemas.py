@@ -5,6 +5,11 @@ class LoginIn(BaseModel):
     code: str = Field(min_length=4, max_length=64)
 
 
+class PasswordChangeIn(BaseModel):
+    currentCode: str = Field(min_length=4, max_length=64)
+    newCode: str = Field(min_length=6, max_length=64)
+
+
 class SessionStartIn(BaseModel):
     subjectId: int
 
@@ -51,6 +56,10 @@ class UserUpdateIn(BaseModel):
 
 class GroupIn(BaseModel):
     name: str = Field(min_length=2, max_length=120)
+    track: str = Field(default="general", max_length=32)
+    grade: str | None = Field(default=None, max_length=40)
+    consultantId: int | None = None
+    subjectIds: list[int] = Field(default_factory=list, max_length=100)
 
 
 class SubjectIn(BaseModel):

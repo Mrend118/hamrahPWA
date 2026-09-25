@@ -39,6 +39,34 @@ export async function getAdminChats() {
   return data?.items ?? [];
 }
 
+export async function getAdminGroups() {
+  const data = (await http.get("/admin/groups")).data;
+  return data?.items ?? [];
+}
+export async function createAdminGroup(payload) {
+  return (await http.post("/admin/groups", payload)).data;
+}
+export async function updateAdminGroup(id, payload) {
+  return (await http.patch(`/admin/groups/${id}`, payload)).data;
+}
+export async function deleteAdminGroup(id) {
+  return (await http.del(`/admin/groups/${id}`)).data;
+}
+export async function getAdminSubjects() {
+  const data = (await http.get("/admin/subjects")).data;
+  return data?.items ?? [];
+}
+export async function getCurriculum(track, grade) {
+  const data = (await http.get("/admin/curriculum", { params: { track, grade } })).data;
+  return data?.items ?? [];
+}
+export async function getStudentStudyStats(id) {
+  return (await http.get(`/admin/users/${id}/study-stats`)).data;
+}
+export async function changeOwnPassword(payload) {
+  return (await http.post("/auth/change-password", payload)).data;
+}
+
 export async function getProfileChangeRequests(params = {}) {
   const data = (await http.get("/admin/profile-change-requests", { params }))
     .data;

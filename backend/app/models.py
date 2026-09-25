@@ -14,6 +14,40 @@ class Group(Base):
     name: Mapped[str] = mapped_column(String(120), unique=True, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    profile: Mapped["GroupProfile | None"] = relationship(
+        back_populates="group", uselist=False, cascade="all, delete-orphan"
+    )
+    subject_links: Mapped[list["GroupSubject"]] = relationship(
+        back_populates="group", cascade="all, delete-orphan"
+    )
+
+
+class GroupProfile(Base):
+    __tablename__ = "group_profiles"
+    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), primary_key=True)
+    track: Mapped[str] = mapped_column(String(32), default="general", index=True)
+    grade: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    consultant_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    group: Mapped[Group] = relationship(back_populates="profile")
+    consultant: Mapped["User | None"] = relationship(foreign_keys=[consultant_id])
+
+
+class GroupSubject(Base):
+    __tablename__ = "group_subjects"
+    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), primary_key=True)
+    subject_id: Mapped[int] = mapped_column(ForeignKey("subjects.id"), primary_key=True)
+    group: Mapped[Group] = relationship(back_populates="subject_links")
+    subject: Mapped["Subject"] = relationship()
+
+
+class SubjectCurriculum(Base):
+    __tablename__ = "subject_curricula"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    subject_id: Mapped[int] = mapped_column(ForeignKey("subjects.id"), index=True)
+    track: Mapped[str] = mapped_column(String(32), index=True)
+    grade: Mapped[str] = mapped_column(String(40), index=True)
+    subject: Mapped["Subject"] = relationship()
+    __table_args__ = (UniqueConstraint("subject_id", "track", "grade", name="uq_subject_curriculum"),)
 
 
 class User(Base):

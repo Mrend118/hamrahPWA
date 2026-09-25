@@ -159,3 +159,41 @@ def test_admin_can_start_chat_with_any_active_student_and_has_no_grade():
         )
         assert new_admin.status_code == 201
         assert new_admin.json()["user"]["grade"] is None
+
+
+def test_curriculum_group_stats_and_own_password():
+    with TestClient(app) as client:
+        admin = auth(client, "87654321")
+        superadmin = auth(client, "98765432")
+        admins = client.get("/api/admin/users", headers=superadmin).json()["items"]
+        consultant = next(item for item in admins if item["role"] == "admin")
+        curriculum = client.get("/api/admin/curriculum", headers=superadmin, params={"track": "middle", "grade": "نهم"})
+        assert curriculum.status_code == 200
+        subjects = curriculum.json()["items"]
+        assert {"ریاضی", "علوم تجربی"}.issubset({item["title"] for item in subjects})
+        selected = subjects[:3]
+        group = client.post("/api/admin/groups", headers=superadmin, json={
+            "name": "گروه نهم", "track": "middle", "grade": "نهم",
+            "consultantId": consultant["id"], "subjectIds": [item["id"] for item in selected],
+        })
+        assert group.status_code == 201
+        created = client.post("/api/admin/users", headers=superadmin, json={
+            "fullName": "دانش‌آموز نهم", "role": "student", "grade": "نهم", "groupId": group.json()["id"],
+        })
+        student_id = created.json()["user"]["id"]
+        student = auth(client, created.json()["loginCode"])
+        assert {item["id"] for item in client.get("/api/subjects", headers=student).json()["items"]} == {item["id"] for item in selected}
+        started = client.post("/api/study-sessions/start", headers=student, json={"subjectId": selected[0]["id"]})
+        session_id = started.json()["id"]
+        client.post("/api/study-sessions/end", headers=student, json={"sessionId": session_id})
+        with SessionLocal() as db:
+            row = db.get(StudySession, session_id)
+            row.accumulated_seconds = 3960
+            db.commit()
+        client.post("/api/study-sessions/save", headers=student, json={"sessionId": session_id})
+        stats = client.get(f"/api/admin/users/{student_id}/study-stats", headers=admin)
+        assert stats.status_code == 200
+        assert stats.json()["totalSeconds"] == 3960
+        changed = client.post("/api/auth/change-password", headers=superadmin, json={"currentCode": "98765432", "newCode": "New-SA-987654"})
+        assert changed.status_code == 200
+        assert client.post("/api/auth/login", json={"code": "New-SA-987654"}).status_code == 200
