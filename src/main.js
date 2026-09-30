@@ -64,7 +64,7 @@ async function bootstrap() {
   if (CONFIG.useMock) {
     console.info(
       "%c[همراه] حالت داده آزمایشی فعال است. برای اتصال به بک‌اند: VITE_USE_MOCK=false",
-      "color:#5de0d0",
+      "color:#e8b949",
     );
   }
 }

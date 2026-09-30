@@ -12,16 +12,19 @@
   --text-muted: oklch(76% 0.016 172);
   --text-faint: oklch(62% 0.018 172);
 
-  --primary: oklch(80% 0.128 188);
-  --primary-hover: oklch(85% 0.118 188);
-  --primary-press: oklch(73% 0.128 188);
-  --primary-soft: oklch(31% 0.055 188);
-  --on-primary: oklch(20% 0.045 190);
+  /* turquoise -> gold */
+  --primary: oklch(80% 0.13 84);
+  --primary-hover: oklch(85% 0.12 84);
+  --primary-press: oklch(73% 0.13 84);
+  --primary-soft: oklch(31% 0.055 84);
+  --on-primary: oklch(18% 0.03 80);
 
   --gold: oklch(80% 0.13 84);
   --gold-hover: oklch(85% 0.12 84);
   --gold-soft: oklch(30% 0.055 84);
-  --on-gold: oklch(22% 0.045 80);
+  --on-gold: oklch(18% 0.03 80);
+  --on-gold-muted: oklch(30% 0.045 80);
+  --gold-deep: oklch(52% 0.11 72);
 
   --silver: oklch(84% 0.012 210);
   --silver-soft: oklch(32% 0.012 210);
