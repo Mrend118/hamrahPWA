@@ -18,8 +18,9 @@
   display: grid;
   gap: var(--space-md);
   padding: var(--space-lg);
-  background: var(--surface-1);
-  border: 1px solid var(--border);
+  background: var(--gold);
+  color: var(--on-gold);
+  border: 1px solid var(--gold-hover);
   border-radius: var(--radius-lg);
 }
 .stat-primary {
@@ -33,7 +34,7 @@
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: var(--gold-soft);
+  background: var(--on-gold);
   color: var(--gold);
   flex: none;
 }
@@ -43,9 +44,12 @@
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
+.stat-primary .value {
+  color: var(--on-gold);
+}
 .stat-primary .label {
   font-size: var(--text-sm);
-  color: var(--text-muted);
+  color: var(--on-gold-muted);
 }
 
 .stat-secondary {
@@ -53,16 +57,17 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-sm);
   padding-block-start: var(--space-md);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid oklch(18% 0.03 80 / 0.25);
 }
 .stat-cell .label {
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
   font-size: var(--text-xs);
-  color: var(--text-faint);
+  color: var(--on-gold-muted);
 }
 .stat-cell .value {
+  color: var(--on-gold);
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   letter-spacing: -0.01em;
@@ -70,7 +75,10 @@
 .stat-cell .value small {
   font-size: var(--text-sm);
   font-weight: 400;
-  color: var(--text-muted);
+  color: var(--on-gold-muted);
+}
+.stat-rail .skeleton {
+  background: oklch(18% 0.03 80 / 0.18);
 }
 
 .subject-list {
@@ -84,15 +92,16 @@
   gap: var(--space-xs) var(--space-md);
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
-  background: var(--surface-1);
-  border: 1px solid var(--border);
+  background: var(--gold);
+  color: var(--on-gold);
+  border: 1px solid var(--gold-hover);
   transition:
     border-color var(--dur-fast) var(--ease-out-quart),
     background-color var(--dur-fast) var(--ease-out-quart);
 }
 .subject-row:hover {
-  background: var(--surface-2);
-  border-color: var(--border-strong);
+  background: var(--gold-hover);
+  border-color: var(--gold-hover);
 }
 .subject-name {
   display: flex;
@@ -104,25 +113,27 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
+  background: var(--on-gold);
   flex: none;
 }
 .subject-time {
   font-size: var(--text-sm);
-  color: var(--text-muted);
+  color: var(--on-gold);
+  font-weight: var(--weight-medium);
   font-variant-numeric: tabular-nums;
 }
 .subject-bar {
   grid-column: 1 / -1;
   height: 5px;
   border-radius: var(--radius-pill);
-  background: var(--surface-3);
+  background: oklch(18% 0.03 80 / 0.18);
   overflow: hidden;
 }
 .subject-bar > span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--primary);
+  background: var(--gold-deep);
   transform-origin: right center;
   animation: bar-grow var(--dur-slow) var(--ease-out-expo);
 }

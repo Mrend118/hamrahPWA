@@ -18,7 +18,6 @@ import {
 import {
   escapeHtml,
   setButtonLoading,
-  subjectColor,
 } from "../../utils/helpers.js";
 import {
   bindRetry,
@@ -261,10 +260,9 @@ function renderSubjects(items) {
     ${sorted
       .map((item) => {
         const ratio = Math.round(((item.minutes || 0) / max) * 100);
-        const color = subjectColor(item.title ?? item.subjectId);
         return `<div class="subject-row">
         <span class="subject-name">
-          <span class="subject-dot" style="background:${color}"></span>
+          <span class="subject-dot"></span>
           ${escapeHtml(item.title ?? "بدون نام")}
         </span>
         <span class="subject-time">${escapeHtml(
@@ -274,7 +272,7 @@ function renderSubjects(items) {
               : minutesToMs(item.minutes),
           ),
         )}</span>
-        <span class="subject-bar"><span style="width:${ratio}%;background:${color}"></span></span>
+        <span class="subject-bar"><span style="width:${ratio}%"></span></span>
       </div>`;
       })
       .join("")}
