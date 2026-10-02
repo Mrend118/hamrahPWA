@@ -54,7 +54,7 @@ export function initials(name = "") {
     : `${parts[0].slice(0, 1)}${parts[1].slice(0, 1)}`;
 }
 
-const SUBJECT_HUES = [188, 84, 158, 300, 24, 260, 120, 52];
+const SUBJECT_HUES = [84, 84, 158, 300, 24, 260, 120, 52];
 export function subjectColor(key = "") {
   let sum = 0;
   for (const ch of String(key)) sum += ch.codePointAt(0);

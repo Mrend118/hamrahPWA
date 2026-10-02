@@ -1,4 +1,4 @@
-const VERSION = "hamrah-v9";
+const VERSION = "hamrah-v12";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 
@@ -73,6 +73,24 @@ self.addEventListener("fetch", (event) => {
             .match("./index.html")
             .then((cached) => cached || Response.error()),
         ),
+    );
+    return;
+  }
+
+  // Vite's hashed build files never change; serve them straight from cache once stored.
+  if (url.origin === self.location.origin && /\/assets\/.+-[\w-]{8,}\.\w+$/.test(url.pathname)) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response && response.status === 200) {
+              const copy = response.clone();
+              caches.open(ASSET_CACHE).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          }),
+      ),
     );
     return;
   }

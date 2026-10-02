@@ -1,7 +1,6 @@
 import { CONFIG } from "../config.js";
 import { ApiError, ERROR_KINDS, kindFromStatus } from "./errors.js";
 import { storage, STORAGE_KEYS } from "../utils/storage.js";
-import { mockRequest } from "../mock/index.js";
 
 export const ENDPOINTS = {
   login: "/auth/login",
@@ -43,6 +42,8 @@ function authHeaders() {
 export async function request(endpoint, options = {}) {
   const { method = "GET", body, params, signal, auth = true } = options;
   if (CONFIG.useMock) {
+    // Loaded on demand so mock data never ships in the production startup bundle.
+    const { mockRequest } = await import("../mock/index.js");
     return mockRequest(method, endpoint, { body, params });
   }
 
